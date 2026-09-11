@@ -1051,7 +1051,37 @@ export const swaggerDocument = {
                 tags: ["Tarefas"],
                 security: [{ bearerAuth: [] }],
                 description:
-                    "Retorna todas as tarefas cadastradas pelo usuário autenticado, com detalhes de categoria e meta inclusos.",
+                    "Retorna todas as tarefas cadastradas pelo usuário autenticado, com detalhes de categoria e meta inclusos. Permite filtragem por status, categoria, meta e data.",
+                parameters: [
+                    {
+                        name: "status",
+                        in: "query",
+                        required: false,
+                        schema: { type: "string", enum: ["TODO", "IN_PROGRESS", "DONE"] },
+                        description: "Filtrar por status",
+                    },
+                    {
+                        name: "categoryId",
+                        in: "query",
+                        required: false,
+                        schema: { type: "string", format: "uuid" },
+                        description: "Filtrar por ID da categoria",
+                    },
+                    {
+                        name: "goalId",
+                        in: "query",
+                        required: false,
+                        schema: { type: "string", format: "uuid" },
+                        description: "Filtrar por ID da meta",
+                    },
+                    {
+                        name: "date",
+                        in: "query",
+                        required: false,
+                        schema: { type: "string", format: "date" },
+                        description: "Filtrar por data de vencimento exata (YYYY-MM-DD)",
+                    }
+                ],
                 responses: {
                     200: {
                         description: "Lista de tarefas",

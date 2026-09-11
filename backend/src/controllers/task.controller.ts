@@ -26,6 +26,7 @@ export class TaskController {
 
             return res.status(201).json(task);
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: "Erro interno." });
         }
     }
@@ -33,17 +34,47 @@ export class TaskController {
     async list(req: Request, res: Response) {
         try {
             const userId = req.userId;
+            const { status, categoryId, goalId, date } = req.query;
+
+            const where: any = { userId };
+
+            if (status) {
+                where.status = String(status);
+            }
+            if (categoryId) {
+                where.categoryId = String(categoryId);
+            }
+            if (goalId) {
+                where.goalId = String(goalId);
+            }
+            if (date) {
+                const searchDate = new Date(String(date));
+                if (!isNaN(searchDate.getTime())) {
+                    const nextDay = new Date(searchDate);
+                    nextDay.setDate(searchDate.getDate() + 1);
+                    
+                    where.dueDate = {
+                        gte: searchDate,
+                        lt: nextDay
+                    };
+                }
+            }
 
             const tasks = await prisma.task.findMany({
-                where: { userId },
+                where,
                 include: {
                     category: true,
                     goal: true,
                 },
+                orderBy: [
+                    { dueDate: { sort: 'asc', nulls: 'last' } },
+                    { createdAt: 'desc' }
+                ]
             });
 
             return res.json(tasks);
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: "Erro interno." });
         }
     }
@@ -84,6 +115,7 @@ export class TaskController {
 
             return res.json(updatedTask);
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: "Erro interno." });
         }
     }
@@ -114,6 +146,7 @@ export class TaskController {
 
             return res.status(204).send();
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: "Erro interno." });
         }
     }
