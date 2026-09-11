@@ -42,4 +42,76 @@ export class UserController {
       return res.status(500).json({ error: 'Erro interno no servidor.' });
     }
   }
+
+  async me(req: Request, res: Response) {
+    try {
+      const userId = req.userId;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true
+        }
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado.' });
+      }
+
+      return res.json(user);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Erro interno no servidor.' });
+    }
+  }
+
+  async updateProfile(req: Request, res: Response) {
+    try {
+      const userId = req.userId;
+      const { name, oldPassword, newPassword } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado.' });
+      }
+
+      const dataToUpdate: any = {};
+
+      if (name) {
+        dataToUpdate.name = name;
+      }
+
+      if (oldPassword && newPassword) {
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password_hash);
+        if (!isPasswordValid) {
+          return res.status(401).json({ error: 'Senha atual incorreta.' });
+        }
+        
+        const salt = await bcrypt.genSalt(10);
+        dataToUpdate.password_hash = await bcrypt.hash(newPassword, salt);
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: dataToUpdate,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true
+        }
+      });
+
+      return res.json(updatedUser);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Erro interno no servidor.' });
+    }
+  }
 }

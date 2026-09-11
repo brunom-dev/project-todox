@@ -123,6 +123,25 @@ export const swaggerDocument = {
                     },
                 },
             },
+            UserProfileUpdateRequest: {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        example: "Bruno Macedo Atualizado",
+                    },
+                    oldPassword: {
+                        type: "string",
+                        format: "password",
+                        example: "senha123",
+                    },
+                    newPassword: {
+                        type: "string",
+                        format: "password",
+                        example: "novaSenha456",
+                    },
+                },
+            },
             Category: {
                 type: "object",
                 properties: {
@@ -623,6 +642,74 @@ export const swaggerDocument = {
                                 },
                             },
                         },
+                    },
+                },
+            },
+        },
+        "/api/users/me": {
+            get: {
+                summary: "Obter perfil do usuário",
+                tags: ["Autenticação"],
+                security: [{ bearerAuth: [] }],
+                description: "Retorna as informações do usuário autenticado no momento.",
+                responses: {
+                    200: {
+                        description: "Dados do usuário recuperados com sucesso",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    $ref: "#/components/schemas/User",
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Não autorizado",
+                    },
+                    404: {
+                        description: "Usuário não encontrado",
+                    },
+                    500: {
+                        description: "Erro interno no servidor",
+                    },
+                },
+            },
+        },
+        "/api/users/profile": {
+            put: {
+                summary: "Atualizar perfil",
+                tags: ["Autenticação"],
+                security: [{ bearerAuth: [] }],
+                description: "Permite atualizar o nome do usuário e a senha. Para alterar a senha, é obrigatório informar a senha antiga.",
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: {
+                                $ref: "#/components/schemas/UserProfileUpdateRequest",
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Perfil atualizado com sucesso",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    $ref: "#/components/schemas/User",
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Senha atual incorreta ou Não autorizado",
+                    },
+                    404: {
+                        description: "Usuário não encontrado",
+                    },
+                    500: {
+                        description: "Erro interno no servidor",
                     },
                 },
             },
