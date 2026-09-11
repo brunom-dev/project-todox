@@ -150,4 +150,45 @@ export class TaskController {
             return res.status(500).json({ error: "Erro interno." });
         }
     }
+    async alerts(req: Request, res: Response) {
+        try {
+            const userId = req.userId;
+            const now = new Date();
+            
+            // Prazos em até 3 dias
+            const limitDate = new Date();
+            limitDate.setDate(now.getDate() + 3);
+
+            const overdue = await prisma.task.findMany({
+                where: {
+                    userId,
+                    status: { not: "DONE" },
+                    dueDate: { lt: now }
+                },
+                include: { category: true, goal: true },
+                orderBy: { dueDate: "asc" }
+            });
+
+            const upcoming = await prisma.task.findMany({
+                where: {
+                    userId,
+                    status: { not: "DONE" },
+                    dueDate: {
+                        gte: now,
+                        lte: limitDate
+                    }
+                },
+                include: { category: true, goal: true },
+                orderBy: { dueDate: "asc" }
+            });
+
+            return res.json({
+                overdue,
+                upcoming
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Erro interno." });
+        }
+    }
 }

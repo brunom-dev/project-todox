@@ -1045,6 +1045,43 @@ export const swaggerDocument = {
                 },
             },
         },
+        "/api/tasks/alerts": {
+            get: {
+                summary: "Alertas de Tarefas",
+                tags: ["Tarefas"],
+                security: [{ bearerAuth: [] }],
+                description:
+                    "Retorna duas listas de tarefas do usuário: 'overdue' (tarefas atrasadas não concluídas) e 'upcoming' (tarefas para os próximos 3 dias não concluídas).",
+                responses: {
+                    200: {
+                        description: "Listas de tarefas para alertas",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        overdue: {
+                                            type: "array",
+                                            items: { $ref: "#/components/schemas/Task" },
+                                        },
+                                        upcoming: {
+                                            type: "array",
+                                            items: { $ref: "#/components/schemas/Task" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Não autorizado",
+                    },
+                    500: {
+                        description: "Erro interno no servidor",
+                    },
+                },
+            },
+        },
         "/api/tasks": {
             get: {
                 summary: "Listar tarefas",
