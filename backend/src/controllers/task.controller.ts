@@ -25,8 +25,11 @@ export class TaskController {
             });
 
             return res.status(201).json(task);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
+            if (error.code === 'P2003') {
+                return res.status(400).json({ error: "Categoria ou Meta fornecida não existe." });
+            }
             return res.status(500).json({ error: "Erro interno." });
         }
     }
@@ -114,8 +117,11 @@ export class TaskController {
             });
 
             return res.json(updatedTask);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
+            if (error.code === 'P2003') {
+                return res.status(400).json({ error: "Categoria ou Meta fornecida não existe." });
+            }
             return res.status(500).json({ error: "Erro interno." });
         }
     }

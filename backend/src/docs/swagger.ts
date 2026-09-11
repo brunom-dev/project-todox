@@ -438,6 +438,10 @@ export const swaggerDocument = {
                                 format: "float",
                                 example: 70.0,
                             },
+                            weeklyCompletedTasks: {
+                                type: "integer",
+                                example: 5,
+                            },
                         },
                     },
                     tasksByCategory: {
@@ -450,14 +454,18 @@ export const swaggerDocument = {
                                     format: "uuid",
                                     example: "b4c126d4-8db9-4672-9653-53da38fbb725",
                                 },
-                                _count: {
-                                    type: "object",
-                                    properties: {
-                                        _all: {
-                                            type: "integer",
-                                            example: 8,
-                                        },
-                                    },
+                                name: {
+                                    type: "string",
+                                    example: "Faculdade",
+                                },
+                                color: {
+                                    type: "string",
+                                    nullable: true,
+                                    example: "#3B82F6",
+                                },
+                                count: {
+                                    type: "integer",
+                                    example: 8,
                                 },
                             },
                         },

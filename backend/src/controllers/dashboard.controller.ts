@@ -17,10 +17,37 @@ export class DashboardController {
             const completionRate =
                 totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
 
-            const tasksByCategory = await prisma.task.groupBy({
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            const weeklyCompletedTasks = await prisma.task.count({
+                where: { 
+                    userId, 
+                    status: "DONE",
+                    dueDate: { gte: oneWeekAgo }
+                },
+            });
+
+            const tasksByCategoryRaw = await prisma.task.groupBy({
                 by: ["categoryId"],
                 where: { userId, status: "DONE", categoryId: { not: null } },
                 _count: { _all: true },
+            });
+
+            const categoryIds = tasksByCategoryRaw.map(t => t.categoryId as string);
+            const categories = await prisma.category.findMany({
+                where: { id: { in: categoryIds } },
+                select: { id: true, name: true, color: true }
+            });
+            
+            const tasksByCategory = tasksByCategoryRaw.map(t => {
+                const cat = categories.find(c => c.id === t.categoryId);
+                return {
+                    categoryId: t.categoryId,
+                    name: cat?.name || "Desconhecida",
+                    color: cat?.color || null,
+                    count: t._count._all
+                };
             });
 
             const goals = await prisma.goal.findMany({
@@ -50,11 +77,13 @@ export class DashboardController {
                     totalTasks,
                     completedTasks,
                     completionRate,
+                    weeklyCompletedTasks
                 },
                 tasksByCategory,
                 goalsProgress,
             });
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: "Erro interno." });
         }
     }
