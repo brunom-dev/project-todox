@@ -6,6 +6,8 @@ import { categoryRoutes } from "./routes/category.routes.js";
 import { goalRoutes } from "./routes/goal.routes.js";
 import { taskRoutes } from "./routes/task.routes.js";
 import { dashboardRoutes } from "./routes/dashboard.routes.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerDocument } from "./docs/swagger.js";
 
 import dotenv from "dotenv";
 
@@ -27,6 +29,17 @@ app.get("/ping", async (req, res) => {
         res.status(500).json({ error: "Erro ao conectar no banco" });
     }
 });
+
+// Documentação Swagger (OpenAPI 3.0)
+app.get(["/api/docs.json", "/docs.json"], (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerDocument);
+});
+
+const swaggerUiMiddleware = swaggerUi.setup(swaggerDocument, {
+    customSiteTitle: "TodoX API Docs",
+});
+app.use(["/api/docs", "/docs"], swaggerUi.serve, swaggerUiMiddleware);
 
 app.use("/api", userRoutes);
 app.use("/api", categoryRoutes);

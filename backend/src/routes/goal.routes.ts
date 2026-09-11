@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 const goalRoutes = Router();
 const goalController = new GoalController();
 
-goalRoutes.use(authMiddleware);
+goalRoutes.use('/goals', authMiddleware);
 
 goalRoutes.post('/goals', goalController.create);
 goalRoutes.get('/goals', goalController.list);

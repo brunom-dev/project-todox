@@ -5,7 +5,7 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 const dashboardRoutes = Router();
 const dashboardController = new DashboardController();
 
-dashboardRoutes.use(authMiddleware);
+dashboardRoutes.use('/dashboard', authMiddleware);
 
 dashboardRoutes.get("/dashboard/insights", dashboardController.getInsights);
 

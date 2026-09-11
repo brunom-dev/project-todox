@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 const categoryRoutes = Router();
 const categoryController = new CategoryController();
 
-categoryRoutes.use(authMiddleware);
+categoryRoutes.use('/categories', authMiddleware);
 
 categoryRoutes.post('/categories', categoryController.create);
 categoryRoutes.get('/categories', categoryController.list);
