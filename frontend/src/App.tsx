@@ -1,122 +1,176 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { Button, Input, Badge } from './components/ui';
+import { Sun, Moon, CheckCircle2, Plus, Search, ArrowRight } from 'lucide-react';
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem('todox-theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  const [btnLoading, setBtnLoading] = useState(false);
+  const [sampleError, setSampleError] = useState('');
+
+  // Aplica a classe .dark no HTML raiz e persiste a preferência no localStorage
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('todox-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('todox-theme', 'light');
+    }
+  }, [isDark]);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-200">
+      {/* Header com semântica correta */}
+      <header className="border-b border-[var(--border-default)] bg-[var(--bg-surface)] sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--brand-primary)] text-[var(--brand-contrast)] flex items-center justify-center font-bold text-lg shadow-sm">
+              T
+            </div>
+            <div>
+              <h1 className="text-base font-bold tracking-tight">TodoX Design System</h1>
+              <p className="text-xs text-[var(--text-secondary)]">Módulo 1: Tokens e Componentes Primitivos</p>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDark(!isDark)}
+            aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            leftIcon={isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+          >
+            {isDark ? 'Modo Claro' : 'Modo Escuro'}
+          </Button>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+      </header>
+
+      {/* Conteúdo Principal */}
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-10">
+        {/* Seção de Badges */}
+        <section aria-labelledby="section-badges" className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-4">
+          <h2 id="section-badges" className="text-sm font-bold tracking-wide uppercase text-[var(--text-secondary)]">
+            1. Badges & Indicadores de Status (A11y)
+          </h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="todo">Pendente (TODO)</Badge>
+            <Badge variant="in_progress">Em Andamento</Badge>
+            <Badge variant="done">Concluído</Badge>
+            <Badge variant="neutral">Geral</Badge>
+            <Badge variant="custom" colorHex="#8b5cf6">Faculdade (#8b5cf6)</Badge>
+            <Badge variant="custom" colorHex="#06b6d4">Trabalho (#06b6d4)</Badge>
+            <Badge variant="custom" colorHex="#ec4899">Saúde (#ec4899)</Badge>
+          </div>
+        </section>
+
+        {/* Seção de Botões */}
+        <section aria-labelledby="section-buttons" className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 id="section-buttons" className="text-sm font-bold tracking-wide uppercase text-[var(--text-secondary)]">
+              2. Botões com Estados e Variantes
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setBtnLoading(!btnLoading)}
+            >
+              Alternar Loading: {btnLoading ? 'Ativo' : 'Inativo'}
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="text-xs font-medium text-[var(--text-muted)]">Variantes:</div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="primary" isLoading={btnLoading} leftIcon={<Plus className="w-4 h-4" />}>
+                Criar Nova Tarefa
+              </Button>
+              <Button variant="secondary" isLoading={btnLoading}>
+                Salvar Rascunho
+              </Button>
+              <Button variant="outline" isLoading={btnLoading}>
+                Filtrar Metas
+              </Button>
+              <Button variant="ghost" isLoading={btnLoading}>
+                Cancelar
+              </Button>
+              <Button variant="danger" isLoading={btnLoading}>
+                Excluir Tarefa
+              </Button>
+              <Button variant="primary" disabled>
+                Desabilitado
+              </Button>
+            </div>
+
+            <div className="text-xs font-medium text-[var(--text-muted)] pt-2">Tamanhos:</div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button size="sm">Tamanho Pequeno (sm)</Button>
+              <Button size="md">Tamanho Médio (md)</Button>
+              <Button size="lg" rightIcon={<ArrowRight className="w-4 h-4" />}>
+                Tamanho Grande (lg)
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Seção de Inputs */}
+        <section aria-labelledby="section-inputs" className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 id="section-inputs" className="text-sm font-bold tracking-wide uppercase text-[var(--text-secondary)]">
+              3. Inputs com Labels Acessíveis e Estados de Erro
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSampleError(sampleError ? '' : 'Este campo é obrigatório para continuar.')}
+            >
+              Simular Erro de Validação
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Título da Tarefa"
+              placeholder="Ex: Entregar relatório de métricas"
+              required
+              helperText="Dê um nome claro e objetivo para sua atividade."
+              error={sampleError}
+            />
+
+            <Input
+              label="Buscar Tarefas"
+              placeholder="Pesquisar por nome ou tag..."
+              leftIcon={<Search className="w-4 h-4" />}
+            />
+
+            <Input
+              label="Data de Entrega"
+              type="date"
+              helperText="Defina o prazo limite para a conclusão."
+            />
+
+            <Input
+              label="Campo Bloqueado"
+              value="Apenas para leitura"
+              disabled
+              helperText="Usuário não possui permissão para editar."
+            />
+          </div>
+        </section>
+
+        {/* Status de Validação */}
+        <section className="p-4 rounded-xl bg-[var(--status-done-bg)] text-[var(--status-done)] border border-[var(--status-done-bg)] flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">
+            <strong>Módulo 1 Concluído:</strong> Tokens semânticos, Dark Mode e primitivos UI implementados com acessibilidade e semântica estrita.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        </section>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
