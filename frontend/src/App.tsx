@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Badge } from './components/ui';
-import { Sun, Moon, CheckCircle2, Plus, Search, ArrowRight } from 'lucide-react';
+import { Sun, Moon, CheckCircle2, Plus, Search, ArrowRight, User as UserIcon, LogOut, Key } from 'lucide-react';
+import { useAuthStore } from './stores';
 
 export function App() {
+  const { user, setAuth, logout } = useAuthStore();
   const [isDark, setIsDark] = useState<boolean>(() => {
     const saved = localStorage.getItem('todox-theme');
     if (saved) return saved === 'dark';
@@ -161,11 +163,70 @@ export function App() {
           </div>
         </section>
 
+        {/* Seção 4: Estado de Autenticação Reativo (useAuthStore) */}
+        <section aria-labelledby="section-auth" className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 id="section-auth" className="text-sm font-bold tracking-wide uppercase text-[var(--text-secondary)]">
+              4. Estado de Sessão Reativo (Zustand + Persist)
+            </h2>
+            <Badge variant={user ? 'done' : 'neutral'}>
+              {user ? 'Autenticado' : 'Desconectado'}
+            </Badge>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-default)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[var(--brand-subtle)] text-[var(--brand-primary)] flex items-center justify-center font-bold">
+                <UserIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">
+                  {user ? user.name : 'Nenhum usuário logado'}
+                </p>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  {user ? `${user.email} • ID: ${user.id}` : 'Acesse com suas credenciais ou teste a sessão'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {user ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={logout}
+                  leftIcon={<LogOut className="w-4 h-4" />}
+                >
+                  Encerrar Sessão
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() =>
+                    setAuth(
+                      {
+                        id: 'usr-demo-123',
+                        name: 'Bruno Macedo',
+                        email: 'bruno@todox.dev',
+                      },
+                      'mock-jwt-token-xyz'
+                    )
+                  }
+                  leftIcon={<Key className="w-4 h-4" />}
+                >
+                  Simular Login
+                </Button>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* Status de Validação */}
         <section className="p-4 rounded-xl bg-[var(--status-done-bg)] text-[var(--status-done)] border border-[var(--status-done-bg)] flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
           <p className="text-sm font-medium">
-            <strong>Módulo 1 Concluído:</strong> Tokens semânticos, Dark Mode e primitivos UI implementados com acessibilidade e semântica estrita.
+            <strong>Módulos 1 e 2 Concluídos:</strong> Tokens semânticos, componentes primitivos acessíveis, cliente Axios centralizado e Store Zustand com persistência no LocalStorage.
           </p>
         </section>
       </main>
