@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, AlertCircle, ArrowRight, Sun, Moon } from 'lucide-react';
 import { Button, Input } from '../components/ui';
 import { authService } from '../services';
-import { useAuthStore } from '../stores';
+import { useAuthStore, useThemeStore } from '../stores';
 import { getApiErrorMessage } from '../lib/api';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -55,7 +56,19 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col justify-center py-12 sm:px-6 lg:px-8 px-4 transition-colors duration-200">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col justify-center py-12 sm:px-6 lg:px-8 px-4 transition-colors duration-200 relative">
+      {/* Botão de Alternância de Tema */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+        >
+          {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+        </Button>
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="w-12 h-12 rounded-2xl bg-[var(--brand-primary)] text-[var(--brand-contrast)] mx-auto flex items-center justify-center font-bold text-2xl shadow-md">
           T

@@ -1,29 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Sun, Moon, LogOut, CheckSquare, BarChart2 } from 'lucide-react';
 import { Button } from '../components/ui';
-import { useAuthStore } from '../stores';
+import { useAuthStore, useThemeStore } from '../stores';
 
 export const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
-
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('todox-theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('todox-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('todox-theme', 'light');
-    }
-  }, [isDark]);
+  const { theme, toggleTheme } = useThemeStore();
 
   const handleLogout = () => {
     logout();
@@ -75,10 +60,10 @@ export const AppLayout: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsDark(!isDark)}
-              aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
             >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </Button>
 
             {/* Dados do Usuário e Logout */}

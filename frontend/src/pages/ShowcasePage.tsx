@@ -1,28 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Input, Badge } from '../components/ui';
 import { Sun, Moon, CheckCircle2, Plus, Search, ArrowRight, User as UserIcon, LogOut, Key } from 'lucide-react';
-import { useAuthStore } from '../stores';
+import { useAuthStore, useThemeStore } from '../stores';
 
 export function ShowcasePage() {
   const { user, setAuth, logout } = useAuthStore();
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('todox-theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  const { theme, toggleTheme } = useThemeStore();
   const [btnLoading, setBtnLoading] = useState(false);
   const [sampleError, setSampleError] = useState('');
-
-  // Aplica a classe .dark no HTML raiz e persiste a preferência no localStorage
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('todox-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('todox-theme', 'light');
-    }
-  }, [isDark]);
 
   return (
     <div className="space-y-10">
@@ -35,11 +20,11 @@ export function ShowcasePage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsDark(!isDark)}
-          aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
-          leftIcon={isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+          leftIcon={theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
         >
-          {isDark ? 'Modo Claro' : 'Modo Escuro'}
+          {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
         </Button>
       </div>
 
