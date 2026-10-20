@@ -12,7 +12,7 @@ export const authService = {
    * Realiza login do usuário com email e senha
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const { data } = await api.post<AuthResponse>('/auth/login', credentials);
+    const { data } = await api.post<AuthResponse>('/login', credentials);
     return data;
   },
 

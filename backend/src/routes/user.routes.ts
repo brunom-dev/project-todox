@@ -9,6 +9,7 @@ const authController = new AuthController();
 
 userRoutes.post('/users', userController.create);
 userRoutes.post('/login', authController.login); 
+userRoutes.post('/auth/login', authController.login);
 
 userRoutes.get('/users/me', authMiddleware, userController.me);
 userRoutes.put('/users/profile', authMiddleware, userController.updateProfile);
