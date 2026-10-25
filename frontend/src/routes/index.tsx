@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { LoginPage, RegisterPage, DashboardPage, ShowcasePage } from '../pages';
+import { LoginPage, RegisterPage, DashboardPage, TasksPage, ShowcasePage } from '../pages';
 import { ProtectedRoute, PublicRoute } from '../components/auth';
 import { AppLayout } from '../layouts/AppLayout';
 
@@ -34,6 +34,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardPage />,
+      },
+      {
+        path: 'tasks',
+        element: <TasksPage />,
       },
       {
         path: 'showcase',

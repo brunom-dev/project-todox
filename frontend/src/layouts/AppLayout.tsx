@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, CheckSquare, BarChart2 } from 'lucide-react';
+import { Sun, Moon, LogOut, CheckSquare, BarChart2, Palette } from 'lucide-react';
 import { Button } from '../components/ui';
 import { useAuthStore, useThemeStore } from '../stores';
 
@@ -17,7 +17,8 @@ export const AppLayout: React.FC = () => {
 
   const navItems = [
     { label: 'Dashboard', path: '/', icon: <BarChart2 className="w-4 h-4" /> },
-    { label: 'Design System', path: '/showcase', icon: <CheckSquare className="w-4 h-4" /> },
+    { label: 'Tarefas', path: '/tasks', icon: <CheckSquare className="w-4 h-4" /> },
+    { label: 'Design System', path: '/showcase', icon: <Palette className="w-4 h-4" /> },
   ];
 
   return (

@@ -31,3 +31,14 @@ export interface TaskAlertsResponse {
   overdue: Task[];
   upcoming: Task[];
 }
+
+export interface CreateTaskInput {
+  title: string;
+  description?: string | null;
+  status?: TaskStatus;
+  dueDate?: string | null;
+  categoryId?: string | null;
+  goalId?: string | null;
+}
+
+export type UpdateTaskInput = Partial<CreateTaskInput>;
