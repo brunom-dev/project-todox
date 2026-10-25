@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui';
 import {
   TaskCard,
   TaskFilters,
   TaskSkeleton,
   TaskEmptyState,
+  TaskFormModal,
   type StatusFilterOption,
 } from '../components/tasks';
-import { taskService, categoryService } from '../services';
+import { taskService, categoryService, goalService } from '../services';
 import { getApiErrorMessage } from '../lib/api';
-import type { Task, Category, TaskStatus } from '../types';
+import type { Task, Category, Goal, TaskStatus, CreateTaskInput, UpdateTaskInput } from '../types';
 
 export const TasksPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [successToast, setSuccessToast] = useState('');
@@ -25,19 +27,25 @@ export const TasksPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
-  // Carrega as tarefas e categorias
+  // Estados do Modal de Criação / Edição
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  // Carrega as tarefas, categorias e metas
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage('');
 
     try {
-      const [tasksData, categoriesData] = await Promise.all([
+      const [tasksData, categoriesData, goalsData] = await Promise.all([
         taskService.getTasks(),
         categoryService.getCategories(),
+        goalService.getGoals(),
       ]);
 
       setTasks(tasksData);
       setCategories(categoriesData);
+      setGoals(goalsData);
     } catch (error) {
       const message = getApiErrorMessage(error, 'Não foi possível carregar as tarefas.');
       setErrorMessage(message);
@@ -149,6 +157,43 @@ export const TasksPage: React.FC = () => {
     }
   };
 
+  // Handlers do Modal de Tarefa
+  const handleOpenCreateModal = () => {
+    setTaskToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (task: Task) => {
+    setTaskToEdit(task);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTaskToEdit(null);
+  };
+
+  const handleSaveTask = async (data: CreateTaskInput | UpdateTaskInput) => {
+    try {
+      if (taskToEdit) {
+        const updated = await taskService.updateTask(taskToEdit.id, data);
+        // Atualiza a tarefa na lista local
+        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+        setSuccessToast('Tarefa atualizada com sucesso!');
+      } else {
+        const created = await taskService.createTask(data as CreateTaskInput);
+        // Insere a nova tarefa no início da lista
+        setTasks((prev) => [created, ...prev]);
+        setSuccessToast('Nova tarefa criada com sucesso!');
+      }
+      setTimeout(() => setSuccessToast(''), 3000);
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Erro ao salvar a tarefa.');
+      setErrorMessage(message);
+      throw error;
+    }
+  };
+
   const isFiltered = statusFilter !== 'ALL' || categoryFilter !== 'ALL' || searchQuery.trim().length > 0;
 
   const handleClearFilters = () => {
@@ -193,7 +238,7 @@ export const TasksPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Button
             variant="outline"
             size="sm"
@@ -204,6 +249,15 @@ export const TasksPage: React.FC = () => {
             aria-label="Atualizar lista de tarefas"
           >
             Atualizar
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleOpenCreateModal}
+            leftIcon={<Plus className="w-4 h-4" />}
+          >
+            Nova Tarefa
           </Button>
         </div>
       </section>
@@ -248,6 +302,7 @@ export const TasksPage: React.FC = () => {
                 key={task.id}
                 task={task}
                 onToggleStatus={handleToggleStatus}
+                onEdit={handleOpenEditModal}
                 onDelete={handleDeleteTask}
                 onStatusChange={handleStatusChange}
                 isToggling={togglingTaskId === task.id}
@@ -258,9 +313,20 @@ export const TasksPage: React.FC = () => {
           <TaskEmptyState
             isFiltered={isFiltered}
             onClearFilters={handleClearFilters}
+            onCreateTask={handleOpenCreateModal}
           />
         )}
       </section>
+
+      {/* Modal Acessível de Criação / Edição de Tarefas */}
+      <TaskFormModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        taskToEdit={taskToEdit}
+        categories={categories}
+        goals={goals}
+        onSubmit={handleSaveTask}
+      />
     </div>
   );
 };

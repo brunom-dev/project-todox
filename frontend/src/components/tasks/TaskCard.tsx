@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Check, Calendar, AlertTriangle, Trash2 } from 'lucide-react';
+import { Check, Calendar, AlertTriangle, Trash2, Edit2 } from 'lucide-react';
 import { Badge } from '../ui';
 import type { Task, TaskStatus } from '../../types';
 
 interface TaskCardProps {
   task: Task;
   onToggleStatus: (id: string, currentStatus: TaskStatus) => void;
+  onEdit?: (task: Task) => void;
   onDelete: (id: string) => void;
   onStatusChange?: (id: string, status: TaskStatus) => void;
   isToggling?: boolean;
@@ -14,6 +15,7 @@ interface TaskCardProps {
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   onToggleStatus,
+  onEdit,
   onDelete,
   onStatusChange,
   isToggling = false,
@@ -124,16 +126,29 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             {task.title}
           </h3>
 
-          {/* Ação de Exclusão */}
-          <button
-            type="button"
-            aria-label={`Excluir tarefa: ${task.title}`}
-            disabled={isDeleting}
-            onClick={handleDelete}
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--state-danger)] hover:bg-[var(--state-danger-bg)] transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--state-danger)]"
-          >
-            <Trash2 className="w-4 h-4" aria-hidden="true" />
-          </button>
+          {/* Ações de Edição e Exclusão */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+            {onEdit && (
+              <button
+                type="button"
+                aria-label={`Editar tarefa: ${task.title}`}
+                onClick={() => onEdit(task)}
+                className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-subtle)] transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--brand-primary)]"
+              >
+                <Edit2 className="w-4 h-4" aria-hidden="true" />
+              </button>
+            )}
+
+            <button
+              type="button"
+              aria-label={`Excluir tarefa: ${task.title}`}
+              disabled={isDeleting}
+              onClick={handleDelete}
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--state-danger)] hover:bg-[var(--state-danger-bg)] transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--state-danger)]"
+            >
+              <Trash2 className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Descrição opcional */}
