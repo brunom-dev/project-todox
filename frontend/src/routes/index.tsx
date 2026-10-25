@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { LoginPage, RegisterPage, DashboardPage, TasksPage } from '../pages';
+import { LoginPage, RegisterPage, DashboardPage, TasksPage, GoalsPage } from '../pages';
 import { ProtectedRoute, PublicRoute } from '../components/auth';
 import { AppLayout } from '../layouts/AppLayout';
 
@@ -38,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: 'tasks',
         element: <TasksPage />,
+      },
+      {
+        path: 'goals',
+        element: <GoalsPage />,
       },
     ],
   },
