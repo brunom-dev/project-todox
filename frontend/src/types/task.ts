@@ -9,6 +9,8 @@ export interface Goal {
   title: string;
   description?: string | null;
   deadline?: string | null;
+  tasks?: Task[];
+  createdAt?: string;
 }
 
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
